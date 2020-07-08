@@ -22,7 +22,7 @@ for file in casts/*; do
         echo "---" >> ${dir}/${filename}
 
     else
-        echo "file found ${dir}/$filename} skipping..."
+        echo "file found ${dir}/$filename skipping..."
     fi
 
 done
