@@ -19,7 +19,7 @@ for file in casts/*; do
             echo 'last_modified_at: "'${timestamp}'"' >> ${dir}/${filename} #TODO date formatting
         fi
 
-        echo "source: "${cast_file} >> ${dir}/${filename}
+        echo "source: "/casts/${cast_file} >> ${dir}/${filename}
 
         echo "---" >> ${dir}/${filename}
 
