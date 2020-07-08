@@ -10,6 +10,7 @@ for file in casts/*; do
     raw_file_name=${filename}
     curr_date=$(date +%Y-%m-%d)
     filename=${curr_date}-${filename}.md
+#    TODO allow updating of files?
     if [[ ! -f ${dir}/${filename} ]]; then
         echo "No file found... making one ${dir}/${filename}"
         echo "---" > ${dir}/${filename}
