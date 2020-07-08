@@ -14,9 +14,12 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-##IMPORTANT:
-#castsdir: casts
-
+## Casts:
+casts:
+  speed: 2
+  theme: solarized-dark
+  loop: ""
+  poster: "data:text/plain,\e[5;5HAwesome \e[1;33mdemo!"
 title: Asciinema Viewer Demo
 url: https://benbentwo.github.io/
 baseurl: /asciinema-viewer # NO / at the end
