@@ -1,4 +1,7 @@
 #!/bin/bash
+ls
+pwd
+
 dir='_posts'
 #for file in $(ls casts/*); do
 for file in casts/*; do
