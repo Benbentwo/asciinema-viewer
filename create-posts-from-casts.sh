@@ -4,23 +4,25 @@ dir='_posts'
 mkdir -p ${dir}
 for file in casts/*; do
     json=$(head -n 1 $file)
-    filename=$(basename $file)
-    if [[ ! -f ${dir}/${filename}.md ]]; then
+    filename=$(basename $file  | awk -F '.' '{print $1}')
+    curr_date=$(date +%Y-%m-%d)
+    filename=${curr_date}-${filename}.md
+    if [[ ! -f ${dir}/${filename} ]]; then
         echo "No file found... making one ${dir}/${filename}"
-        echo "---" > ${dir}/${filename}.md
-        echo 'title: "'${file}'"' >> ${dir}/${filename}.md
+        echo "---" > ${dir}/${filename}
+        echo 'title: "'${file}'"' >> ${dir}/${filename}
 
         timestamp=$(echo ${json} | jq -r '.timestamp')
         if [[ ${timestamp} ]]; then
-            echo 'last_modified_at: "'${timestamp}'"' >> ${dir}/${filename}.md #TODO date formatting
+            echo 'last_modified_at: "'${timestamp}'"' >> ${dir}/${filename} #TODO date formatting
         fi
 
-        echo "source: "${file} >> ${dir}/${filename}.md
+        echo "source: "${file} >> ${dir}/${filename}
 
-        echo "---" >> ${dir}/${filename}.md
+        echo "---" >> ${dir}/${filename}
 
     else
-        echo "file found ${dir}/$filename}.md skipping..."
+        echo "file found ${dir}/$filename} skipping..."
     fi
 
 done
