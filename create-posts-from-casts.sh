@@ -1,15 +1,10 @@
 #!/bin/bash
-ls
-pwd
-
 dir='_posts'
-#for file in $(ls casts/*); do
+
+mkdir -p ${dir}
 for file in casts/*; do
-    #chmod +r $file
-    #echo $file
     json=$(head -n 1 $file)
     filename=$(basename $file)
-    #echo $json | jq
     if [[ ! -f ${dir}/${filename}.md ]]; then
         echo "No file found... making one ${dir}/${filename}"
         echo "---" > ${dir}/${filename}.md
