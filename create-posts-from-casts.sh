@@ -5,6 +5,8 @@ mkdir -p ${dir}
 for file in casts/*; do
     json=$(head -n 1 $file)
     filename=$(basename $file  | awk -F '.' '{print $1}')
+    cast_file=$(basename $file)
+    raw_file_name=${filename}
     curr_date=$(date +%Y-%m-%d)
     filename=${curr_date}-${filename}.md
     if [[ ! -f ${dir}/${filename} ]]; then
@@ -17,7 +19,7 @@ for file in casts/*; do
             echo 'last_modified_at: "'${timestamp}'"' >> ${dir}/${filename} #TODO date formatting
         fi
 
-        echo "source: "${file} >> ${dir}/${filename}
+        echo "source: "${cast_file} >> ${dir}/${filename}
 
         echo "---" >> ${dir}/${filename}
 
