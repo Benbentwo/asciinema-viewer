@@ -29,7 +29,7 @@ search: true
 
 # Build settings
 markdown: kramdown
-remote_theme: mmistakes/minimal-mistakes
+remote_theme: Benbentwo/minimal-mistakes-asciinema
 # Outputting
 permalink: /:categories/:title/
 paginate: 5 # amount of posts to show
@@ -96,8 +96,8 @@ defaults:
       path: ""
       type: posts
     values:
-      layout: single
-      author_profile: true
+      layout: cast
+      author_profile: false
       read_time: true
       comments: true
       share: true
