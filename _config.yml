@@ -22,7 +22,8 @@ casts:
   poster: "data:text/plain,\e[5;5HAwesome \e[1;33mdemo!"
 title: Asciinema Viewer Demo
 url: https://benbentwo.github.io/
-baseurl: /asciinema-viewer # NO / at the end
+# NO / at the end
+baseurl: /asciinema-viewer
 email: ben.smith.developer@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Asciinema Viewer Example and Helm Chart
