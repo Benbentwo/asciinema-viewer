@@ -34,12 +34,14 @@ twitter_username: username
 github_username: username
 minimal_mistakes_skin: dark
 search: true
+about: |
+  This site demos how you can github host asciinema casts, it also has an available helm chart... Eventually (TODO)
 
 # Build settings
 markdown: kramdown
 remote_theme: Benbentwo/minimal-mistakes-asciinema
 # Outputting
-permalink: /casts/:title
+permalink: /:categories/:title/
 paginate: 5 # amount of posts to show
 paginate_path: /page:num/
 timezone: # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
@@ -116,7 +118,7 @@ defaults:
       type: pages
     values:
       layout: single
-      author_profile: true
+      author_profile: false
 
 category_archive:
   type: liquid
@@ -124,3 +126,4 @@ category_archive:
 tag_archive:
   type: liquid
   path: /tags/
+
