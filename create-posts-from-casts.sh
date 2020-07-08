@@ -2,6 +2,7 @@
 dir='_posts'
 
 mkdir -p ${dir}
+baseurl=$(cat _config.yml | yq r - -d '*' 'baseurl' | tr -d '/')
 for file in casts/*; do
     json=$(head -n 1 $file)
     filename=$(basename $file  | awk -F '.' '{print $1}')
@@ -19,7 +20,7 @@ for file in casts/*; do
             echo 'last_modified_at: "'${timestamp}'"' >> ${dir}/${filename} #TODO date formatting
         fi
 
-        echo "source: "/casts/${cast_file} >> ${dir}/${filename}
+        echo "source: "/${baseurl}/casts/${cast_file} >> ${dir}/${filename}
 
         echo "---" >> ${dir}/${filename}
 
