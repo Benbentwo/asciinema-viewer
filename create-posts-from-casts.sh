@@ -2,7 +2,7 @@
 dir='_posts'
 
 mkdir -p ${dir}
-baseurl=$(cat _config.yml | yq r - -d '*' 'baseurl' | tr -d '/')
+baseurl=$(cat _config.yml | grep baseurl | head -n 1 | awk -F ':' '{print $2}'| tr -d '/')
 for file in casts/*; do
     json=$(head -n 1 $file)
     filename=$(basename $file  | awk -F '.' '{print $1}')
