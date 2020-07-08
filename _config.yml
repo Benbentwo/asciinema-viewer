@@ -19,7 +19,7 @@
 
 title: Asciinema Viewer Demo
 url: https://benbentwo.github.io/
-baseurl: /asciinema-viewer/
+baseurl: /asciinema-viewer # NO / at the end
 email: ben.smith.developer@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Asciinema Viewer Example and Helm Chart
