@@ -12,7 +12,7 @@ for file in casts/*; do
     if [[ ! -f ${dir}/${filename} ]]; then
         echo "No file found... making one ${dir}/${filename}"
         echo "---" > ${dir}/${filename}
-        echo 'title: "'${file}'"' >> ${dir}/${filename}
+        echo 'title: "'${raw_file_name}'"' >> ${dir}/${filename}
 
         timestamp=$(echo ${json} | jq -r '.timestamp')
         if [[ ${timestamp} ]]; then
