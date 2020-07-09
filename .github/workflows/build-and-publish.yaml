@@ -1,0 +1,128 @@
+name: Merged
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Pull request merged
+        id: get-release-type
+        run: |
+          if [[ "${{github.event.pull_request.state}}" == "closed" ]] || [[ "${{github.event.pull_request.merged}}" == "true" ]]; then
+            echo "##[set-output name=merged;]true"
+            echo '${{toJson(github.event.pull_request)}}' > data.json
+            jq -r '.labels[] | .name' data.json > labels.txt
+            while IFS= read -r name; do
+              echo "Looking at label: \"${name}\""
+              if [[ ${name} =~ [rR]elease\ ([A-Za-z0-9_]+) ]] ; then
+                release_type=${BASH_REMATCH[1]}
+                echo "ReleaseType set to: \"${release_type}\""
+                if echo $release_type | grep -iqF patch; then
+                  echo "Setting to Patch"
+                  echo "##[set-output name=release-type;]patch"
+                  echo "##[set-output name=release-command;]-p"
+                elif echo $release_type | grep -iqF minor; then
+                  echo "Setting to Minor"
+                  echo "##[set-output name=release-type;]minor"
+                  echo "##[set-output name=release-command;]-m"
+                elif echo $release_type | grep -iqF major; then
+                  echo "Setting to Major"
+                  echo "##[set-output name=release-type;]major"
+                  echo "##[set-output name=release-command;]-M"
+                else
+                  echo "Not sure what release this is, defaulting to patch"
+                  echo "##[set-output name=release-type;]patch"
+                  echo "##[set-output name=release-command;]-p"
+                fi
+              fi
+            done < labels.txt
+          else
+            echo "Was not started by pull request, setting to patch"
+            echo "##[set-output name=release-type;]patch"
+            echo "##[set-output name=release-command;]-p"
+          fi
+
+      # https://github.com/Benbentwo/increment-semver
+      - name: Increment Step Patch
+        id: increment-semver-patch
+        uses: Benbentwo/increment-semver@master
+        with:
+          version-level: "${{steps.get-release-type.outputs.release-command}}"
+
+      - run: |
+          tag=${{ steps.increment-semver-patch.outputs.version }}
+          repository=$(echo ${{github.repository}} | tr '[:upper:]' '[:lower:]')
+          repo=$(echo ${{github.repository}} | awk -F '/' '{ print $2 }' | tr '[:upper:]' '[:lower:]')
+          github_image=${repository}/${repo}
+          docker build -t docker.pkg.github.com/${github_image} .
+          echo "##[set-output name=version;]$(echo ${tag})"
+          echo "##[set-output name=repo;]$(echo ${repo})"
+          echo "##[set-output name=github_image;]$(echo ${github_image})"
+
+        id: docker_build
+
+      - name: Publish to Github Packages
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: ${{ steps.docker_build.outputs.github_image }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          tags: "latest,${{steps.docker_build.outputs.version}}"
+          registry: docker.pkg.github.com
+
+      # https://github.com/marketplace/actions/create-a-release
+      - name: Create Release
+
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{steps.increment-semver-patch.outputs.version}}
+          release_name: ${{steps.increment-semver-patch.outputs.version}}
+          draft: false
+          prerelease: false
+
+      - name: Update Chart values with latest
+        run: |
+          repo=${{steps.docker_build.outputs.repo}}
+
+          sed -E -i 's@(repository: \w*)@repository: docker.pkg.github.com/${{ steps.docker_build.outputs.github_image }}@g' charts/${repo}/values.yaml
+          sed -E -i 's@(tag: \w*)@tag: ${{steps.docker_build.outputs.version}}@g' charts/${repo}/values.yaml
+
+          helm package --app-version=${{steps.docker_build.outputs.version}} --version=${{steps.docker_build.outputs.version}} charts/${repo}
+          ls -la ${repo}-${{steps.docker_build.outputs.version}}.tgz
+          echo "##[set-output name=helm_package;]$(echo ${repo}-${{steps.docker_build.outputs.version}}.tgz)"
+        id: helm-package
+
+      - name: Upload Helm Package to release
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{steps.helm-package.outputs.helm_package}}
+          tag: ${{steps.increment-semver-patch.outputs.version}}
+          file_glob: false
+          asset_name: ${{steps.helm-package.outputs.helm_package}}
+
+      - name: Run Helm Release (Different Repository)
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: Benbentwo/Helm-Repo
+          event-type: upload-helm
+          client-payload: '
+            {
+              "repository": "${{steps.docker_build.outputs.repo}}",
+              "helm_chart": "${{steps.helm-package.outputs.helm_package}}",
+              "chart_url": "https://github.com/${{github.repository}}/releases/download/${{steps.docker_build.outputs.version}}/${{steps.docker_build.outputs.repo}}-${{steps.docker_build.outputs.version}}.tgz",
+              "version": "${{steps.docker_build.outputs.version}}"
+            }'

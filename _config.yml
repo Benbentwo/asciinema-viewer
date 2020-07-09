@@ -22,6 +22,7 @@ casts:
   poster: "data:text/plain,\e[5;5HAwesome \e[1;33mdemo!"
 title: Asciinema Viewer Demo
 url: https://benbentwo.github.io/
+repository: Benbentwo/asciinema-viewer
 # NO / at the end
 baseurl: /asciinema-viewer
 email: ben.smith.developer@gmail.com
@@ -52,9 +53,11 @@ include:
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
 # to override the default setting.
-# exclude:
+exclude:
 #   - Gemfile
 #   - Gemfile.lock
+   - charts/
+   - Dockerfile*
 #   - node_modules
 #   - vendor/bundle/
 #   - vendor/cache/
