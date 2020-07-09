@@ -83,6 +83,14 @@ jobs:
           tags: "latest,${{steps.docker_build.outputs.version}}"
           registry: docker.pkg.github.com
 
+      - name: Publish to Docker Hub
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: bensmithdeveloper/${{steps.docker_build.outputs.repo}}
+          username: bensmithdeveloper
+          password: ${{ secrets.DOCKER_HUB_API }}
+          tags: "latest,${{ steps.increment-semver-patch.outputs.version }}"
+
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
@@ -107,7 +115,7 @@ jobs:
         run: |
           repo=${{steps.docker_build.outputs.repo}}
 
-          sed -E -i 's@(repository: \w*)@repository: docker.pkg.github.com/${{ steps.docker_build.outputs.github_image }}@g' charts/${repo}/values.yaml
+          sed -E -i 's@(repository: \w*)@repository: bensmithdeveloper/${{ steps.docker_build.outputs.repo }}@g' charts/${repo}/values.yaml
           sed -E -i 's@(tag: .*$)@tag: ${{steps.docker_build.outputs.version}}@g' charts/${repo}/values.yaml
 
           helm package --app-version=${{steps.docker_build.outputs.version}} --version=${{steps.docker_build.outputs.version}} charts/${repo}
