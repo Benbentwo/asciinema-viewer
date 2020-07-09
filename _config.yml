@@ -86,7 +86,7 @@ footer:
   links:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
-      url: "https://github.com/Benbentwo/asciinema-viewer
+      url: "https://github.com/Benbentwo/asciinema-viewer"
 
 defaults:
   # _posts
