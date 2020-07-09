@@ -1,0 +1,21 @@
+#FROM ruby:2.7-slim AS builder
+FROM jekyll/builder AS builder
+
+#WORKDIR /usr/src/app
+COPY Gemfile .
+RUN bundle install
+
+
+COPY . .
+RUN mkdir -p /srv/jekyll/asciinema-viewer
+RUN jekyll build -d /srv/jekyll/asciinema-viewer
+RUN ls -la && pwd
+RUN ls -la /srv/jekyll/ && \
+    ls -la /srv/jekyll/asciinema-viewer
+FROM jekyll/minimal
+RUN pwd
+COPY --from=builder /srv/jekyll/asciinema-viewer/ /srv/jekyll/
+
+#RUN jekyll serve
+CMD jekyll serve
+#CMD ["tail", "-f", "/dev/null"]
