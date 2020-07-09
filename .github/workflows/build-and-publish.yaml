@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        if: github.event.pull_request.merged
         uses: actions/checkout@v1
 
       - name: Pull request merged
@@ -54,14 +53,12 @@ jobs:
 
       # https://github.com/Benbentwo/increment-semver
       - name: Increment Step Patch
-        if: github.event.pull_request.merged
         id: increment-semver-patch
         uses: Benbentwo/increment-semver@master
         with:
           version-level: "${{steps.get-release-type.outputs.release-command}}"
 
-      - if: github.event.pull_request.merged
-        run: |
+      - run: |
           tag=${{ steps.increment-semver-patch.outputs.version }}
           repository=$(echo ${{github.repository}} | tr '[:upper:]' '[:lower:]')
           repo=$(echo ${{github.repository}} | awk -F '/' '{ print $2 }' | tr '[:upper:]' '[:lower:]')
